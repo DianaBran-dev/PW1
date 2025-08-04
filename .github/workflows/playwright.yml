@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shard: [1, 2]  # 2 joburi paralele
 
     steps:
     - name: Checkout code
@@ -25,12 +28,12 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
 
-    - name: Run Playwright tests
-      run: npx playwright test
+    - name: Run Playwright tests shard ${{ matrix.shard }}
+      run: npx playwright test --shard=${{ matrix.shard }}/2
 
-    - name: Upload test report
+    - name: Upload test report shard ${{ matrix.shard }}
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: playwright-report
+        name: playwright-report-shard-${{ matrix.shard }}
         path: playwright-report/
